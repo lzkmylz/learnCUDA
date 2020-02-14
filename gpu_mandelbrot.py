@@ -14,7 +14,7 @@ mandel_ker = ElementwiseKernel(
     mandelbrot_graph[i] = 1;
     pycuda::complex<float> c = lattice[i];
     pycuda::complex<float> z(0, 0);
-    for(int j = 0; j < max_iters; i++) {
+    for(int j = 0; j < max_iters; j++) {
         z = z * z + c;
         if(abs(z) > upper_bound) {
             mandelbrot_graph[i] = 0;
