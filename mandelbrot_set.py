@@ -6,7 +6,7 @@ matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
 
-def simple_mandelbrot(width, height, real_low, real_high, imag_low, imag_high, max_iters):
+def simple_mandelbrot(width, height, real_low, real_high, imag_low, imag_high, max_iters, upper_bound):
     # np.linspace返回给定区间内按一定间隔分布的数
     real_vals = np.linspace(real_low, real_high, width)
     imag_vals = np.linspace(imag_low, imag_high, height)
@@ -20,7 +20,7 @@ def simple_mandelbrot(width, height, real_low, real_high, imag_low, imag_high, m
             z = np.complex64(0)
             for i in range(max_iters):
                 z = z**2 + c
-                if np.abs(z) > 2:
+                if np.abs(z) > upper_bound:
                     mandelbrot_graph[x, y] = 0
                     break
     return mandelbrot_graph
@@ -28,7 +28,7 @@ def simple_mandelbrot(width, height, real_low, real_high, imag_low, imag_high, m
 
 if __name__ == '__main__':
     t1 = time()
-    mandel = simple_mandelbrot(512, 512, -2, 2, -2, 2, 256)
+    mandel = simple_mandelbrot(512, 512, -2, 2, -2, 2, 256, 2)
     t2 = time()
     mandel_time = t2 - t1
     t1 = time()
