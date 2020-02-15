@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 import pycuda.autoinit
 import pycuda.driver as drv
 from pycuda import gpuarray
@@ -18,30 +17,35 @@ ker = SourceModule("""
 #define _INDEX(x, y) (_XM(x) + _YM(y) * _WIDTH)
 
 __device__ int nbrs(int x, int y, int *in) {
-    return (in[_INDEX(x-1, y+1)] + in[_INDEX(x-1, y)] + in[_INDEX(x-1, y-1)] + in[_INDEX(x, y+1)] + in[_INDEX(x, y-1)] + in[_INDEX(x+1, y+1)] + in[_INDEX(x+1, y)] + in[_INDEX(x+1, y-1)]);
+    return (in[_INDEX(x-1, y+1)] \
+    + in[_INDEX(x-1, y)] \
+    + in[_INDEX(x-1, y-1)] \
+    + in[_INDEX(x, y+1)] \
+    + in[_INDEX(x, y-1)] \
+    + in[_INDEX(x+1, y+1)] \
+    + in[_INDEX(x+1, y)] \
+    + in[_INDEX(x+1, y-1)]);
 }
 
 __global__ void conway_ker(int *lattice_out, int *lattice) {
     int x = _X, y = _Y;
     int n = nbrs(x, y, lattice);
     if(lattice[_INDEX(x, y)] == 1) {
-            switch(n) {
-                case 2:
-                    lattice_out[_INDEX(x, y)] = 1;
-                    break;
-                case 3:
-                    lattice_out[_INDEX(x, y)] = 1;
-                    break;
-                default:
-                    lattice_out[_INDEX(x, y)] = 0;
-        } else if (lattice[_INDEX(x, y)] == 0) {
-            switch(n) {
-                case 3:
-                    lattice_out[_INDEX(x, y)] = 1;
-                    break;
-                default:
-                    lattice_out[_INDEX(x, y)] = 0;
-            }
+        switch(n) {
+            case 2:
+            case 3:
+                lattice_out[_INDEX(x, y)] = 1;
+                break;
+            default:
+                lattice_out[_INDEX(x, y)] = 0;
+        }
+    } else if (lattice[_INDEX(x, y)] == 0) {
+        switch(n) {
+            case 3:
+                lattice_out[_INDEX(x, y)] = 1;
+                break;
+            default:
+                lattice_out[_INDEX(x, y)] = 0;
         }
     }
 }
@@ -63,5 +67,5 @@ if __name__ == "__main__":
 
     fig, ax = plt.subplots()
     img = ax.imshow(lattice_gpu.get(), interpolation='nearest')
-    ani = animation.FuncAnimation(fig, update_gpu, fargs(img, newLattice_gpu, lattice_gpu, N), interval=0, frames=1000, save_count=1000)
+    ani = animation.FuncAnimation(fig, update_gpu, fargs=(img, newLattice_gpu, lattice_gpu, N), interval=0, frames=1000, save_count=1000)
     plt.show()
